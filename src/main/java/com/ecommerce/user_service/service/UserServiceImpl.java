@@ -4,6 +4,7 @@ import com.ecommerce.user_service.dto.UserDto;
 import com.ecommerce.user_service.entity.UserEntity;
 import com.ecommerce.user_service.repository.UserRepository;
 import com.ecommerce.user_service.vo.ResponseOrder;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -37,7 +38,7 @@ public class UserServiceImpl implements UserService {
                 userDto.getName(),
                 uuid,
                 encryptedPwd,
-                1000L
+                1000
         );
 
         userRepository.save(userEntity);
@@ -64,5 +65,23 @@ public class UserServiceImpl implements UserService {
     @Override
     public Iterable<UserEntity> getUserByAll() {
         return userRepository.findAll();
+    }
+
+    @Override
+    @Transactional
+    public UserDto usePoint(String userId, Integer usedPoint) {
+        UserEntity userEntity = userRepository.findByUserId(userId);
+        userEntity.decreasePoint(usedPoint);
+
+        return modelMapper.map(userEntity, UserDto.class);
+    }
+
+    @Override
+    @Transactional
+    public UserDto addPoint(String userId, Integer usedPoint) {
+        UserEntity userEntity = userRepository.findByUserId(userId);
+        userEntity.increasePoint(usedPoint);
+
+        return modelMapper.map(userEntity, UserDto.class);
     }
 }

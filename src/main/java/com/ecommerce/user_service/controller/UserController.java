@@ -3,8 +3,10 @@ package com.ecommerce.user_service.controller;
 import com.ecommerce.user_service.dto.UserDto;
 import com.ecommerce.user_service.entity.UserEntity;
 import com.ecommerce.user_service.service.UserService;
+import com.ecommerce.user_service.vo.RequestPoint;
 import com.ecommerce.user_service.vo.RequestUser;
 import com.ecommerce.user_service.vo.ResponseUser;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -33,7 +35,7 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public ResponseEntity<ResponseUser> createUser(@RequestBody RequestUser user) {
+    public ResponseEntity<ResponseUser> createUser(@Valid @RequestBody RequestUser user) {
         UserDto userDto = modelMapper.map(user, UserDto.class);
         UserDto createUser = userService.createUser(userDto);
         ResponseUser responseUser = modelMapper.map(createUser, ResponseUser.class);
@@ -58,5 +60,24 @@ public class UserController {
         ResponseUser responseUser = modelMapper.map(userDto, ResponseUser.class);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseUser);
+    }
+
+    @PostMapping("/users/{userId}/point/withdraw")
+    public ResponseEntity<ResponseUser> usePoint(@PathVariable("userId") String userId, @RequestBody RequestPoint requestPoint) {
+        Integer point = requestPoint.getPoint();
+        UserDto userDto = userService.usePoint(userId, point);
+
+        ResponseUser response = modelMapper.map(userDto, ResponseUser.class);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PostMapping("/users/{userId}/point/increase")
+    public ResponseEntity<ResponseUser> addPoint(@PathVariable("userId") String userId, @RequestBody RequestPoint requestPoint) {
+        Integer point = requestPoint.getPoint();
+        UserDto userDto = userService.addPoint(userId, point);
+        ResponseUser response = modelMapper.map(userDto, ResponseUser.class);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

@@ -9,4 +9,6 @@ public interface UserService {
     UserDto createUser(UserDto userDto);
     UserDto getUserByUserId(String userId);
     Iterable<UserEntity> getUserByAll();
+    UserDto usePoint(String userId, Integer usedPoint);
+    UserDto addPoint(String userId, Integer usedPoint);
 }

@@ -29,12 +29,12 @@ public class UserEntity {
     @Column(nullable = false)
     private String encryptedPwd;
     @Column(nullable = false)
-    private Long point;
+    private Integer point;
     @Column(nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
 
-    public static UserEntity create(String email, String name, String userId, String encryptedPwd,  Long point) {
+    public static UserEntity create(String email, String name, String userId, String encryptedPwd, Integer point) {
         UserEntity user = new UserEntity();
 
         user.email = email;
@@ -44,5 +44,17 @@ public class UserEntity {
         user.point = point;
 
         return user;
+    }
+
+    public void decreasePoint(Integer amount) {
+        if (this.point < amount) {
+            throw new RuntimeException("Insufficient balance");
+        }
+
+        this.point -= amount;
+    }
+
+    public void increasePoint(Integer amount) {
+        this.point += amount;
     }
 }
