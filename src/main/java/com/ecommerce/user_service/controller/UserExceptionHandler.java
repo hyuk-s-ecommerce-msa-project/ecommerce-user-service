@@ -1,5 +1,6 @@
 package com.ecommerce.user_service.controller;
 
+import com.ecommerce.user_service.exception.WishNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -31,5 +32,10 @@ public class UserExceptionHandler {
         });
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors.toString());
+    }
+
+    @ExceptionHandler(WishNotFoundException.class)
+    public ResponseEntity<String> handleWishNotFoundException(WishNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 }
