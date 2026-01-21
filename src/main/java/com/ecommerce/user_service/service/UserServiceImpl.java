@@ -1,20 +1,29 @@
 package com.ecommerce.user_service.service;
 
+import com.ecommerce.user_service.dto.TokenResponse;
 import com.ecommerce.user_service.dto.UserDto;
 import com.ecommerce.user_service.entity.UserEntity;
 import com.ecommerce.user_service.repository.UserRepository;
 import com.ecommerce.user_service.vo.ResponseOrder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.env.Environment;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.sql.Date;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -23,11 +32,70 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    Environment env;
+    private final Environment env;
 
     private final UserRepository userRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
+
     private final ModelMapper modelMapper;
     private final BCryptPasswordEncoder passwordEncoder;
+
+    @Override
+    public void storeRefreshToken(String userId, String refreshToken, long expirationTime) {
+        redisTemplate.opsForValue().set(
+                "refreshToken:" + userId,
+                refreshToken,
+                Duration.ofMillis(expirationTime)
+        );
+    }
+
+    @Override
+    @Transactional
+    public TokenResponse reissueAccessToken(String refreshToken) {
+        byte[] secretKeyBytes = env.getProperty("token.secret").getBytes(StandardCharsets.UTF_8);
+        SecretKey secretKey = Keys.hmacShaKeyFor(secretKeyBytes);
+
+        String userId;
+
+        try {
+            userId = Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(refreshToken)
+                    .getPayload()
+                    .getSubject();
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid refresh token");
+        }
+
+        String savedToken = (String) redisTemplate.opsForValue().get("refreshToken:" + userId);
+
+        if (savedToken == null || !savedToken.equals(refreshToken)) {
+            throw new RuntimeException("Refresh token expired or invalid");
+        }
+
+        Instant now = Instant.now();
+
+        String newAccessToken = Jwts.builder()
+                .subject(userId)
+                .expiration(Date.from(now.plusMillis(Long.parseLong(env.getProperty("token.access-token.expiration-time")))))
+                .issuedAt(Date.from(now))
+                .signWith(secretKey, Jwts.SIG.HS512)
+                .compact();
+
+        long refreshTime = Long.parseLong(env.getProperty("token.refresh-token.expiration-time"));
+
+        String newRefreshToken = Jwts.builder()
+                .subject(userId)
+                .expiration(Date.from(now.plusMillis(refreshTime)))
+                .issuedAt(Date.from(now))
+                .signWith(secretKey, Jwts.SIG.HS512)
+                .compact();
+
+        storeRefreshToken(userId, newRefreshToken, refreshTime);
+
+        return TokenResponse.builder().accessToken(newAccessToken).refreshToken(newRefreshToken).build();
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

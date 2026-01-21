@@ -19,8 +19,8 @@ public class WishController {
     private final WishService wishService;
     private final ModelMapper modelMapper;
 
-    @GetMapping("/list/{userId}")
-    public ResponseEntity<List<ResponseWish>> getWishList(@PathVariable String userId) {
+    @GetMapping("/wish/list")
+    public ResponseEntity<List<ResponseWish>> getWishList(@RequestHeader("userId") String userId) {
         List<WishDto> wishDtoList = wishService.getWishList(userId);
 
         List<ResponseWish> items = wishDtoList.stream()
@@ -31,9 +31,9 @@ public class WishController {
     }
 
     @PostMapping("/wish/add")
-    public ResponseEntity<ResponseWish> addWish(@RequestBody RequestWish request) {
+    public ResponseEntity<ResponseWish> addWish(@RequestBody RequestWish request, @RequestHeader("userId") String userId) {
         WishDto dto = modelMapper.map(request, WishDto.class);
-        WishDto added = wishService.addToWish(dto);
+        WishDto added = wishService.addToWish(dto, userId);
 
         ResponseWish response = modelMapper.map(added, ResponseWish.class);
 
@@ -41,8 +41,8 @@ public class WishController {
     }
 
     @DeleteMapping("/wish/delete/{wishId}")
-    public ResponseEntity<String> deleteWish(@PathVariable String wishId) {
-        wishService.removeWish(wishId);
+    public ResponseEntity<String> deleteWish(@PathVariable String wishId, @RequestHeader("userId") String userId) {
+        wishService.removeWish(wishId, userId);
 
         return ResponseEntity.status(HttpStatus.OK).body("Wish has been deleted, wish ID : " + wishId);
     }

@@ -71,14 +71,28 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
         Instant now = Instant.now();
 
-        String token = Jwts.builder()
+        // access token
+        String accessToken = Jwts.builder()
                 .subject(userDetails.getUserId())
-                .expiration(Date.from(now.plusMillis(Long.parseLong(env.getProperty("token.expiration-time")))))
+                .expiration(Date.from(now.plusMillis(Long.parseLong(env.getProperty("token.access-token.expiration-time")))))
                 .issuedAt(Date.from(now))
                 .signWith(secretKey, Jwts.SIG.HS512)
                 .compact();
 
-        response.addHeader("token", token);
+        // refresh token
+        long refreshTime = Long.parseLong(env.getProperty("token.refresh-token.expiration-time"));
+
+        String refreshToken = Jwts.builder()
+                        .subject(userDetails.getUserId())
+                        .expiration(Date.from(now.plusMillis(refreshTime)))
+                        .issuedAt(Date.from(now))
+                        .signWith(secretKey, Jwts.SIG.HS512)
+                        .compact();
+
+        userService.storeRefreshToken(userDetails.getUserId(), refreshToken, refreshTime);
+
+        response.addHeader("accessToken", accessToken);
+        response.addHeader("refreshToken", refreshToken);
         response.addHeader("userId", userDetails.getUserId());
     }
 }

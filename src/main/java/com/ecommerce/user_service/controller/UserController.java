@@ -43,7 +43,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseUser);
     }
 
-    @GetMapping("/users")
+    @GetMapping("/info/list")
     public ResponseEntity<List<ResponseUser>> getUsers() {
         Iterable<UserEntity> userList = userService.getUserByAll();
 
@@ -54,16 +54,16 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
-    @GetMapping("/users/{userId}")
-    public ResponseEntity<ResponseUser> getUser(@PathVariable("userId") String userId) {
+    @GetMapping("/info")
+    public ResponseEntity<ResponseUser> getUser(@RequestHeader("userId") String userId) {
         UserDto userDto = userService.getUserByUserId(userId);
         ResponseUser responseUser = modelMapper.map(userDto, ResponseUser.class);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseUser);
     }
 
-    @PostMapping("/users/{userId}/point/withdraw")
-    public ResponseEntity<ResponseUser> usePoint(@PathVariable("userId") String userId, @RequestBody RequestPoint requestPoint) {
+    @PostMapping("/point/withdraw")
+    public ResponseEntity<ResponseUser> usePoint(@RequestHeader("userId") String userId, @RequestBody RequestPoint requestPoint) {
         Integer point = requestPoint.getPoint();
         UserDto userDto = userService.usePoint(userId, point);
 
@@ -72,8 +72,8 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping("/users/{userId}/point/increase")
-    public ResponseEntity<ResponseUser> addPoint(@PathVariable("userId") String userId, @RequestBody RequestPoint requestPoint) {
+    @PostMapping("/point/increase")
+    public ResponseEntity<ResponseUser> addPoint(@RequestHeader("userId") String userId, @RequestBody RequestPoint requestPoint) {
         Integer point = requestPoint.getPoint();
         UserDto userDto = userService.addPoint(userId, point);
         ResponseUser response = modelMapper.map(userDto, ResponseUser.class);

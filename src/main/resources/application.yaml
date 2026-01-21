@@ -6,6 +6,10 @@ spring:
     import: "optional:file:.env[.properties]"
   application:
     name: user-service
+  data:
+    redis:
+      host: localhost
+      port: 6379
   h2:
     console:
       enabled: true
@@ -32,4 +36,7 @@ eureka:
 
 token:
   secret: ${TOKEN_SECRET}
-  expiration-time: 864000000 # 10 days
+  access-token:
+    expiration-time: 1800000 # 30 minutes
+  refresh-token:
+    expiration-time: 864000000 # 10 days

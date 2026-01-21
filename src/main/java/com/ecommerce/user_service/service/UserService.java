@@ -1,5 +1,6 @@
 package com.ecommerce.user_service.service;
 
+import com.ecommerce.user_service.dto.TokenResponse;
 import com.ecommerce.user_service.dto.UserDto;
 import com.ecommerce.user_service.entity.UserEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,4 +14,7 @@ public interface UserService extends UserDetailsService {
     UserDto usePoint(String userId, Integer usedPoint);
     UserDto addPoint(String userId, Integer usedPoint);
     UserDto getUserDetailsByEmail(String email);
+
+    void storeRefreshToken(String userId, String refreshToken, long expirationTime);
+    TokenResponse reissueAccessToken(String refreshToken);
 }

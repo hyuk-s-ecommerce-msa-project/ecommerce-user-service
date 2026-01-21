@@ -6,7 +6,6 @@ import java.util.List;
 
 @Data
 public class RequestWish {
-    private String userId;
     private String productId;
     private String productName;
     private Integer price;

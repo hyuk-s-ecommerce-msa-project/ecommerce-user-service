@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,7 +26,7 @@ public class WishServiceImpl implements WishService {
         List<WishEntity> wish = wishRepository.findByUserId(userId);
 
         if (wish.isEmpty()) {
-            throw new WishNotFoundException("No wish for userId : " + userId);
+            return new ArrayList<>();
         }
 
         return convertEntityToDto(wish);
@@ -33,17 +34,17 @@ public class WishServiceImpl implements WishService {
 
     @Override
     @Transactional
-    public WishDto addToWish(WishDto wishDto) {
-        WishEntity ExistingWish = wishRepository.findByUserIdAndProductId(wishDto.getUserId(), wishDto.getProductId());
+    public WishDto addToWish(WishDto wishDto, String userId) {
+        WishEntity existingWish = wishRepository.findByUserIdAndProductId(userId, wishDto.getProductId());
 
-        if (ExistingWish != null) {
+        if (existingWish != null) {
             throw new RuntimeException("Wish already exists");
         }
 
         String wishId = "WISH-" + UUID.randomUUID().toString();
 
         WishEntity wishList = WishEntity.create(
-                wishId, wishDto.getUserId(), wishDto.getProductId(), wishDto.getProductName(),
+                wishId, userId, wishDto.getProductId(), wishDto.getProductName(),
                 wishDto.getPrice() , wishDto.getThumbnailUrl()
         );
 
@@ -70,11 +71,15 @@ public class WishServiceImpl implements WishService {
 
     @Override
     @Transactional
-    public void removeWish(String wishId) {
+    public void removeWish(String wishId, String userId) {
         WishEntity wishEntity = wishRepository.findByWishId(wishId);
 
         if (wishEntity == null) {
             throw new WishNotFoundException("Wish not found");
+        }
+
+        if (!wishEntity.getUserId().equals(userId)) {
+            throw new RuntimeException("You do not have permission to remove this wish.");
         }
 
         wishRepository.deleteById(wishEntity.getId());
