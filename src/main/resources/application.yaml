@@ -45,3 +45,12 @@ token:
     expiration-time: 1800000 # 30 minutes
   refresh-token:
     expiration-time: 864000000 # 10 days
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - beans
+          - info
