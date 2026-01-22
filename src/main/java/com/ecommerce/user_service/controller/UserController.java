@@ -31,7 +31,12 @@ public class UserController {
     public String status() {
         return String.format("It's working in User Service" +
                 ", port(local.server.port)=" + env.getProperty("local.server.port") +
-                ", port(server.port)=" + env.getProperty("server.port"));
+                ", port(server.port)=" + env.getProperty("server.port") +
+                ", gateway ip(env)=" + env.getProperty("gateway.ip") +
+                ", token secret key=" + env.getProperty("token.secret") +
+                ", access token expiration time=" + env.getProperty("token.access-token.expiration-time") +
+                ", refresh token expiration time=" + env.getProperty("token.refresh-token.expiration-time") +
+                ", kakao secret key=" + env.getProperty("kakao.secret"));
     }
 
     @PostMapping("/users")
