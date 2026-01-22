@@ -2,10 +2,15 @@ server:
   port: 0
 
 spring:
-  config:
-    import: "optional:file:.env[.properties]"
   application:
     name: user-service
+  cloud:
+    config:
+      name: gameinfo
+  config:
+    import:
+      - "optional:file:.env[.properties]"
+      - "optional:configserver:http://localhost:8888"
   data:
     redis:
       host: localhost
