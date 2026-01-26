@@ -4,12 +4,14 @@ server:
 spring:
   application:
     name: user-service
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
   cloud:
     config:
-      name: gameinfo
+      name: gameinfo,user-service
   config:
     import:
-      - "optional:file:.env[.properties]"
       - "optional:configserver:http://localhost:8888"
   data:
     redis:
@@ -21,11 +23,6 @@ spring:
       settings:
         web-allow-others: true
       path: /h2-console
-  datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;
-    username: sa
-    password:
   jpa:
     hibernate:
       ddl-auto: update
@@ -47,3 +44,4 @@ management:
           - health
           - beans
           - info
+          - busrefresh

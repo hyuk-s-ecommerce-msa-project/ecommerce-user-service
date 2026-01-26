@@ -40,10 +40,12 @@ public class WebSecurity {
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/auth/refresh").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/users/**").permitAll()
+                        .requestMatchers("/login").permitAll()
                         .requestMatchers("/**").access(
                                 new WebExpressionAuthorizationManager(
                                         "hasIpAddress('127.0.0.1') or hasIpAddress('::1') or " +
-                                                "hasIpAddress('211.107.64.18') or hasIpAddress('::1')")) // host pc ip address
+                                                "hasIpAddress('211.195.178.168') or hasIpAddress('::1')")) // host pc ip address
                         .anyRequest().authenticated()
                 )
                 .authenticationManager(authenticationManager)
