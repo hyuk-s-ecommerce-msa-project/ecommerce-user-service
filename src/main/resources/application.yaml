@@ -45,3 +45,7 @@ management:
           - beans
           - info
           - busrefresh
+
+logging:
+  level:
+    com.ecommerce.user_service.client: DEBUG

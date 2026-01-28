@@ -32,7 +32,7 @@ public class WishEntity {
     @Column(nullable = false)
     private Integer price;
     @Column(nullable = false)
-    private String thumbnailUrl;
+    private String headerImage;
 
     @OneToMany(mappedBy = "wish", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WishCategory> categories = new ArrayList<>();
@@ -43,7 +43,7 @@ public class WishEntity {
     @CreatedDate
     private LocalDateTime createdAt;
 
-    public static WishEntity create(String wishId, String userId, String productId, String productName, Integer price, String thumbnailUrl) {
+    public static WishEntity create(String wishId, String userId, String productId, String productName, Integer price, String headerImage) {
         WishEntity wish = new WishEntity();
 
         wish.wishId = wishId;
@@ -51,7 +51,7 @@ public class WishEntity {
         wish.productId = productId;
         wish.productName = productName;
         wish.price = price;
-        wish.thumbnailUrl = thumbnailUrl;
+        wish.headerImage = headerImage;
         wish.createdAt = LocalDateTime.now();
 
         return wish;

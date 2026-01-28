@@ -9,7 +9,7 @@ public class RequestWish {
     private String productId;
     private String productName;
     private Integer price;
-    private String thumbnailUrl;
+    private String headerImage;
     private List<String> categories;
     private List<String> genres;
 }

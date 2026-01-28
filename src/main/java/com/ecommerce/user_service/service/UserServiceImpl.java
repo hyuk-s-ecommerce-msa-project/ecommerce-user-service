@@ -1,5 +1,6 @@
 package com.ecommerce.user_service.service;
 
+import com.ecommerce.user_service.client.OrderServiceClient;
 import com.ecommerce.user_service.dto.TokenResponse;
 import com.ecommerce.user_service.dto.UserDto;
 import com.ecommerce.user_service.entity.UserEntity;
@@ -39,6 +40,8 @@ public class UserServiceImpl implements UserService {
 
     private final ModelMapper modelMapper;
     private final BCryptPasswordEncoder passwordEncoder;
+
+    private final OrderServiceClient orderServiceClient;
 
     @Override
     public void storeRefreshToken(String userId, String refreshToken, long expirationTime) {
@@ -145,7 +148,7 @@ public class UserServiceImpl implements UserService {
 
         UserDto userDto = modelMapper.map(userEntity, UserDto.class);
 
-        List<ResponseOrder> orderList = new ArrayList<>();
+        List<ResponseOrder> orderList = orderServiceClient.getOrders(userId);
         userDto.addOrder(orderList);
 
         return userDto;

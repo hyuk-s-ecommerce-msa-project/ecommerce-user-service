@@ -14,6 +14,6 @@ public class ResponseWish {
     private Integer price;
     private List<String> categories;
     private List<String> genres;
-    private String thumbnailUrl;
+    private String headerImage;
     private LocalDateTime createdAt;
 }

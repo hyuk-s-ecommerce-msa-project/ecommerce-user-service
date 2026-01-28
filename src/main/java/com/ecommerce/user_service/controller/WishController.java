@@ -30,10 +30,9 @@ public class WishController {
         return ResponseEntity.status(HttpStatus.OK).body(items);
     }
 
-    @PostMapping("/wish/add")
-    public ResponseEntity<ResponseWish> addWish(@RequestBody RequestWish request, @RequestHeader("userId") String userId) {
-        WishDto dto = modelMapper.map(request, WishDto.class);
-        WishDto added = wishService.addToWish(dto, userId);
+    @PostMapping("/wish/add/{productId}")
+    public ResponseEntity<ResponseWish> addWish(@RequestHeader("userId") String userId, @PathVariable("productId") String productId) {
+        WishDto added = wishService.addToWish(userId, productId);
 
         ResponseWish response = modelMapper.map(added, ResponseWish.class);
 
