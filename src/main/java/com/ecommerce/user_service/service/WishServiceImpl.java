@@ -61,8 +61,8 @@ public class WishServiceImpl implements WishService {
 
         if (wishProductList.getGenres() != null) {
             wishProductList.getGenres().stream()
-                    .map(m -> WishGenre.create(m, wishList))
-                    .forEach(m -> wishList.getGenres().add(m));
+                    .map(g -> WishGenre.create(g, wishList))
+                    .forEach(genre -> wishList.getGenres().add(genre));
         }
 
         wishRepository.save(wishList);
