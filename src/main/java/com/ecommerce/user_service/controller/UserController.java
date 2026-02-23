@@ -6,6 +6,7 @@ import com.ecommerce.user_service.service.UserService;
 import com.ecommerce.user_service.vo.RequestPoint;
 import com.ecommerce.user_service.vo.RequestUser;
 import com.ecommerce.user_service.vo.ResponseUser;
+import io.micrometer.core.annotation.Timed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +28,8 @@ public class UserController {
     private final UserService userService;
     private final ModelMapper modelMapper;
 
-    @GetMapping("/health-check")
+    @GetMapping("/info/health-check")
+    @Timed(value = "users.status", longTask = true)
     public String status() {
         return String.format("It's working in User Service" +
                 ", port(local.server.port)=" + env.getProperty("local.server.port") +

@@ -1,6 +1,7 @@
 package com.ecommerce.user_service;
 
 import feign.Logger;
+import io.micrometer.observation.ObservationRegistry;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -28,5 +29,4 @@ public class UserServiceApplication {
 	public Logger.Level feignLoggerLevel() {
 		return Logger.Level.FULL;
 	}
-
 }

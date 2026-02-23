@@ -1,5 +1,6 @@
 package com.ecommerce.user_service.controller;
 
+import com.ecommerce.user_service.exception.CatalogServiceException;
 import com.ecommerce.user_service.exception.WishNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,5 +38,10 @@ public class UserExceptionHandler {
     @ExceptionHandler(WishNotFoundException.class)
     public ResponseEntity<String> handleWishNotFoundException(WishNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(CatalogServiceException.class)
+    public ResponseEntity<String> handleCatalogException(CatalogServiceException ex) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(ex.getMessage());
     }
 }

@@ -12,6 +12,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.User;
@@ -42,6 +44,8 @@ public class UserServiceImpl implements UserService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     private final OrderServiceClient orderServiceClient;
+
+    private final CircuitBreakerFactory circuitBreakerFactory;
 
     @Override
     public void storeRefreshToken(String userId, String refreshToken, long expirationTime) {
@@ -148,7 +152,11 @@ public class UserServiceImpl implements UserService {
 
         UserDto userDto = modelMapper.map(userEntity, UserDto.class);
 
-        List<ResponseOrder> orderList = orderServiceClient.getOrders(userId);
+//        List<ResponseOrder> orderList = orderServiceClient.getOrders(userId);
+        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("circuitBreaker");
+        List<ResponseOrder> orderList = circuitBreaker.run(() -> orderServiceClient.getOrders(userId),
+                throwable -> new ArrayList<>());
+
         userDto.addOrder(orderList);
 
         return userDto;

@@ -5,12 +5,15 @@ import com.ecommerce.user_service.dto.WishDto;
 import com.ecommerce.user_service.entity.WishCategory;
 import com.ecommerce.user_service.entity.WishEntity;
 import com.ecommerce.user_service.entity.WishGenre;
+import com.ecommerce.user_service.exception.CatalogServiceException;
 import com.ecommerce.user_service.exception.WishNotFoundException;
 import com.ecommerce.user_service.repository.WishRepository;
 import com.ecommerce.user_service.vo.ResponseWish;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,6 +26,7 @@ public class WishServiceImpl implements WishService {
     private final WishRepository wishRepository;
     private final ModelMapper modelMapper;
     private final CatalogServiceClient catalogServiceClient;
+    private final CircuitBreakerFactory circuitBreakerFactory;
 
     @Override
     public List<WishDto> getWishList(String userId) {
@@ -46,7 +50,12 @@ public class WishServiceImpl implements WishService {
 
         String wishId = "WISH-" + UUID.randomUUID().toString();
 
-        ResponseWish wishProductList = catalogServiceClient.getCatalogs(productId);
+//        ResponseWish wishProductList = catalogServiceClient.getCatalogs(productId);
+        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("catalog-circuitBreaker");
+        ResponseWish wishProductList = circuitBreaker.run(() -> catalogServiceClient.getCatalogs(productId),
+                throwable -> {
+                    throw new CatalogServiceException("찜하기 기능은 현재 오류가 있습니다. 나중에 다시 시도해주세요.");
+                });
 
         WishEntity wishList = WishEntity.create(
                 wishId, userId, wishProductList.getProductId(), wishProductList.getProductName(),

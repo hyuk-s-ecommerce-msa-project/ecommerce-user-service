@@ -9,7 +9,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -35,10 +37,10 @@ public class WishEntity {
     private String headerImage;
 
     @OneToMany(mappedBy = "wish", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<WishCategory> categories = new ArrayList<>();
+    private Set<WishCategory> categories = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "wish", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<WishGenre> genres = new ArrayList<>();
+    private Set<WishGenre> genres = new LinkedHashSet<>();
 
     @CreatedDate
     private LocalDateTime createdAt;
