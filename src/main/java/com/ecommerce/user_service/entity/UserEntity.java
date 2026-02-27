@@ -1,6 +1,5 @@
 package com.ecommerce.user_service.entity;
 
-import com.ecommerce.user_service.dto.UserDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -17,7 +16,6 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public class UserEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, length = 50, unique = true)
@@ -34,9 +32,10 @@ public class UserEntity {
     @CreatedDate
     private LocalDateTime createdAt;
 
-    public static UserEntity create(String email, String name, String userId, String encryptedPwd, Integer point) {
+    public static UserEntity create(Long id, String email, String name, String userId, String encryptedPwd, Integer point) {
         UserEntity user = new UserEntity();
 
+        user.id = id;
         user.email = email;
         user.name = name;
         user.userId = userId;

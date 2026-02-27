@@ -1,5 +1,6 @@
 package com.ecommerce.user_service.service;
 
+import com.ecommerce.snowflake.util.SnowflakeIdGenerator;
 import com.ecommerce.user_service.client.CatalogServiceClient;
 import com.ecommerce.user_service.dto.WishDto;
 import com.ecommerce.user_service.entity.WishCategory;
@@ -27,6 +28,7 @@ public class WishServiceImpl implements WishService {
     private final ModelMapper modelMapper;
     private final CatalogServiceClient catalogServiceClient;
     private final CircuitBreakerFactory circuitBreakerFactory;
+    private final SnowflakeIdGenerator snowflakeIdGenerator;
 
     @Override
     public List<WishDto> getWishList(String userId) {
@@ -49,6 +51,7 @@ public class WishServiceImpl implements WishService {
         }
 
         String wishId = "WISH-" + UUID.randomUUID().toString();
+        Long snowflakeId = snowflakeIdGenerator.nextId();
 
 //        ResponseWish wishProductList = catalogServiceClient.getCatalogs(productId);
         CircuitBreaker circuitBreaker = circuitBreakerFactory.create("catalog-circuitBreaker");
@@ -58,7 +61,7 @@ public class WishServiceImpl implements WishService {
                 });
 
         WishEntity wishList = WishEntity.create(
-                wishId, userId, wishProductList.getProductId(), wishProductList.getProductName(),
+                snowflakeId, wishId, userId, wishProductList.getProductId(), wishProductList.getProductName(),
                 wishProductList.getPrice() , wishProductList.getHeaderImage()
         );
 

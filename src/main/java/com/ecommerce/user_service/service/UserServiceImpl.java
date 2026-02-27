@@ -1,5 +1,6 @@
 package com.ecommerce.user_service.service;
 
+import com.ecommerce.snowflake.util.SnowflakeIdGenerator;
 import com.ecommerce.user_service.client.OrderServiceClient;
 import com.ecommerce.user_service.dto.TokenResponse;
 import com.ecommerce.user_service.dto.UserDto;
@@ -46,6 +47,8 @@ public class UserServiceImpl implements UserService {
     private final OrderServiceClient orderServiceClient;
 
     private final CircuitBreakerFactory circuitBreakerFactory;
+
+    private final SnowflakeIdGenerator snowflakeIdGenerator;
 
     @Override
     public void storeRefreshToken(String userId, String refreshToken, long expirationTime) {
@@ -126,10 +129,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto createUser(UserDto userDto) {
         String uuid = "USER-" + UUID.randomUUID().toString();
+        Long snowflakeId = snowflakeIdGenerator.nextId();
 
         String encryptedPwd = passwordEncoder.encode(userDto.getPwd());
 
         UserEntity userEntity = UserEntity.create(
+                snowflakeId,
                 userDto.getEmail(),
                 userDto.getName(),
                 uuid,

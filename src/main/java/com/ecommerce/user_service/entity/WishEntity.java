@@ -20,7 +20,6 @@ import java.util.Set;
 @EntityListeners(AuditingEntityListener.class)
 public class WishEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true, nullable = false)
@@ -45,9 +44,10 @@ public class WishEntity {
     @CreatedDate
     private LocalDateTime createdAt;
 
-    public static WishEntity create(String wishId, String userId, String productId, String productName, Integer price, String headerImage) {
+    public static WishEntity create(Long id, String wishId, String userId, String productId, String productName, Integer price, String headerImage) {
         WishEntity wish = new WishEntity();
 
+        wish.id = id;
         wish.wishId = wishId;
         wish.userId = userId;
         wish.productId = productId;
