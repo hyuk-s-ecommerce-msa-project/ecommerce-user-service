@@ -1,11 +1,21 @@
 server:
   port: 0
+  tomcat:
+    threads:
+      max: 200
+      min-spare: 20
+    connection-timeout: 5000ms
 
 spring:
+  threads:
+    virtual:
+      enabled: true
   datasource:
     url: jdbc:mariadb://localhost:3306/gameinfo_user
   application:
     name: user-service
+  kafka:
+    bootstrap-servers: localhost:9092
   rabbitmq:
     host: 127.0.0.1
     port: 5672
@@ -17,6 +27,10 @@ spring:
       - "optional:configserver:http://localhost:9088"
   data:
     redis:
+      lettuce:
+        pool:
+          max-active: 150
+          max-idle: 50
       host: localhost
       port: 6379
   h2:
@@ -27,11 +41,13 @@ spring:
       path: /h2-console
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
-        default_batch_fetch_size: 100
+        jdbc:
+          batch_size: 1000
+        default_batch_fetch_size: 1000
         use_id_generator_strategy_three_lo: false
         format_sql: true
         dialect: org.hibernate.dialect.MariaDBDialect
@@ -52,7 +68,11 @@ management:
     enabled: true
   zipkin:
     tracing:
-      endpoint: http://localhost:9411/api/v2/spans
+      endpoint: ""
+    sender:
+      type: kafka
+    kafka:
+      topic: zipkin
   endpoints:
     web:
       exposure:
@@ -63,7 +83,3 @@ management:
           - busrefresh
           - prometheus
           - metrics
-
-logging:
-  level:
-    com.ecommerce.user_service.client: DEBUG

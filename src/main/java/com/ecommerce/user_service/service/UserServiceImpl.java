@@ -16,7 +16,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -50,6 +53,7 @@ public class UserServiceImpl implements UserService {
 
     private final SnowflakeIdGenerator snowflakeIdGenerator;
 
+    @Async
     @Override
     public void storeRefreshToken(String userId, String refreshToken, long expirationTime) {
         redisTemplate.opsForValue().set(
@@ -168,8 +172,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Iterable<UserEntity> getUserByAll() {
-        return userRepository.findAll();
+    public Page<UserEntity> getUserByAll(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
     @Override

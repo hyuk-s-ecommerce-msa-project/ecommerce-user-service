@@ -69,6 +69,7 @@ dependencies {
 	implementation 'io.micrometer:micrometer-registry-prometheus'
 
 	implementation 'org.springframework.kafka:spring-kafka'
+	implementation 'io.zipkin.reporter2:zipkin-sender-kafka'
 
 	implementation 'com.ecommerce:snowflake:1.0'
 }

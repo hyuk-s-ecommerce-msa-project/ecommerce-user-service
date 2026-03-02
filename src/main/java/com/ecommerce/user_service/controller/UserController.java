@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -51,12 +53,10 @@ public class UserController {
     }
 
     @GetMapping("/info/list")
-    public ResponseEntity<List<ResponseUser>> getUsers() {
-        Iterable<UserEntity> userList = userService.getUserByAll();
+    public ResponseEntity<Page<ResponseUser>> getUsers(Pageable pageable) {
+        Page<UserEntity> userList = userService.getUserByAll(pageable);
 
-        List<ResponseUser> result = new ArrayList<>();
-
-        userList.forEach(user -> result.add(modelMapper.map(user, ResponseUser.class)));
+        Page<ResponseUser> result = userList.map(user -> modelMapper.map(user, ResponseUser.class));
 
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }

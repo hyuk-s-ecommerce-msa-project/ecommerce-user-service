@@ -31,6 +31,7 @@ import java.util.Date;
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final UserService userService;
     private final Environment env;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public AuthenticationFilter(UserService userService, Environment env, AuthenticationManager authenticationManager) {
         this.userService = userService;
@@ -42,7 +43,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         try {
 
-            RequestLogin creds = new ObjectMapper().readValue(request.getInputStream(), RequestLogin.class);
+            RequestLogin creds = objectMapper.readValue(request.getInputStream(), RequestLogin.class);
 
             return getAuthenticationManager().authenticate(
                     new UsernamePasswordAuthenticationToken(

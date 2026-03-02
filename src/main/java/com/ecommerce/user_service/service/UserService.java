@@ -3,6 +3,8 @@ package com.ecommerce.user_service.service;
 import com.ecommerce.user_service.dto.TokenResponse;
 import com.ecommerce.user_service.dto.UserDto;
 import com.ecommerce.user_service.entity.UserEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;
@@ -10,7 +12,7 @@ import java.util.List;
 public interface UserService extends UserDetailsService {
     UserDto createUser(UserDto userDto);
     UserDto getUserByUserId(String userId);
-    Iterable<UserEntity> getUserByAll();
+    Page<UserEntity> getUserByAll(Pageable pageable);
     UserDto usePoint(String userId, Integer usedPoint);
     UserDto addPoint(String userId, Integer usedPoint);
     UserDto getUserDetailsByEmail(String email);
