@@ -72,6 +72,8 @@ dependencies {
 	implementation 'io.zipkin.reporter2:zipkin-sender-kafka'
 
 	implementation 'com.ecommerce:snowflake:1.0'
+
+	implementation 'org.bouncycastle:bcprov-jdk18on:1.77'
 }
 
 dependencyManagement {

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,7 @@ class UserServiceImplTest {
     private UserRepository userRepository;
 
     @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private PasswordEncoder argon2PasswordEncoder;
 
     @Autowired
     private SnowflakeIdGenerator snowflakeIdGenerator;
@@ -30,7 +31,7 @@ class UserServiceImplTest {
         int totalCount = 100000;
         int batchSize = 1000;
 
-        String encodedPwd = bCryptPasswordEncoder.encode("123456");
+        String encodedPwd = argon2PasswordEncoder.encode("123456");
 
         List<UserEntity> userList = new ArrayList<>();
 

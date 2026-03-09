@@ -24,6 +24,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -45,7 +46,7 @@ public class UserServiceImpl implements UserService {
     private final RedisTemplate<String, Object> redisTemplate;
 
     private final ModelMapper modelMapper;
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final PasswordEncoder argon2PasswordEncoder;
 
     private final OrderServiceClient orderServiceClient;
 
@@ -135,7 +136,7 @@ public class UserServiceImpl implements UserService {
         String uuid = "USER-" + UUID.randomUUID().toString();
         Long snowflakeId = snowflakeIdGenerator.nextId();
 
-        String encryptedPwd = passwordEncoder.encode(userDto.getPwd());
+        String encryptedPwd = argon2PasswordEncoder.encode(userDto.getPwd());
 
         UserEntity userEntity = UserEntity.create(
                 snowflakeId,

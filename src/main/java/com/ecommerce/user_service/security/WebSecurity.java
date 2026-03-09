@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 import org.springframework.security.web.util.matcher.IpAddressMatcher;
@@ -21,7 +22,7 @@ import org.springframework.security.web.util.matcher.IpAddressMatcher;
 public class WebSecurity {
     private final UserService userService;
     private final Environment env;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final PasswordEncoder argon2PasswordEncoder;
 
     public static final String ALLOWED_IP_ADDRESS = "127.0.0.1";
     public static final String SUBNET = "/32";
@@ -31,7 +32,7 @@ public class WebSecurity {
     protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder =
                 http.getSharedObject(AuthenticationManagerBuilder.class);
-        authenticationManagerBuilder.userDetailsService(userService).passwordEncoder(bCryptPasswordEncoder);
+        authenticationManagerBuilder.userDetailsService(userService).passwordEncoder(argon2PasswordEncoder);
 
         AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
 
