@@ -57,43 +57,57 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         }
     }
 
+
     @Override
     protected void successfulAuthentication(HttpServletRequest request,
                                             HttpServletResponse response,
                                             FilterChain chain,
                                             Authentication authResult) throws IOException, ServletException {
+        try {
+            String userEmail = ((User) authResult.getPrincipal()).getUsername();
+            UserDto userDetails = userService.getUserDetailsByEmail(userEmail);
 
-        String userEmail = ((User) authResult.getPrincipal()).getUsername();
-        UserDto userDetails = userService.getUserDetailsByEmail(userEmail);
+            String secret = env.getProperty("token.secret");
+            String accessExpiration = env.getProperty("token.access-token.expiration-time");
+            String refreshExpiration = env.getProperty("token.refresh-token.expiration-time");
 
-        byte[] secretKeyBytes = env.getProperty("token.secret").getBytes(StandardCharsets.UTF_8);
+            byte[] secretKeyBytes = secret.getBytes(StandardCharsets.UTF_8);
+            SecretKey secretKey = Keys.hmacShaKeyFor(secretKeyBytes);
+            Instant now = Instant.now();
 
-        SecretKey secretKey = Keys.hmacShaKeyFor(secretKeyBytes);
+            String accessToken = Jwts.builder()
+                    .subject(userDetails.getUserId())
+                    .expiration(Date.from(now.plusMillis(Long.parseLong(accessExpiration))))
+                    .issuedAt(Date.from(now))
+                    .signWith(secretKey, Jwts.SIG.HS512)
+                    .compact();
 
-        Instant now = Instant.now();
+            long refreshTime = Long.parseLong(refreshExpiration);
+            String refreshToken = Jwts.builder()
+                    .subject(userDetails.getUserId())
+                    .expiration(Date.from(now.plusMillis(refreshTime)))
+                    .issuedAt(Date.from(now))
+                    .signWith(secretKey, Jwts.SIG.HS512)
+                    .compact();
 
-        // access token
-        String accessToken = Jwts.builder()
-                .subject(userDetails.getUserId())
-                .expiration(Date.from(now.plusMillis(Long.parseLong(env.getProperty("token.access-token.expiration-time")))))
-                .issuedAt(Date.from(now))
-                .signWith(secretKey, Jwts.SIG.HS512)
-                .compact();
+            userService.storeRefreshToken(userDetails.getUserId(), refreshToken, refreshTime);
 
-        // refresh token
-        long refreshTime = Long.parseLong(env.getProperty("token.refresh-token.expiration-time"));
+            response.addHeader("accessToken", accessToken);
+            response.addHeader("refreshToken", refreshToken);
+            response.addHeader("userId", userDetails.getUserId());
 
-        String refreshToken = Jwts.builder()
-                        .subject(userDetails.getUserId())
-                        .expiration(Date.from(now.plusMillis(refreshTime)))
-                        .issuedAt(Date.from(now))
-                        .signWith(secretKey, Jwts.SIG.HS512)
-                        .compact();
+        } catch (Exception e) {
+            log.error(">>>> [CRITICAL ERROR] Failed in successfulAuthentication: {}", e.getMessage(), e);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Token process failed");
+        }
+    }
 
-        userService.storeRefreshToken(userDetails.getUserId(), refreshToken, refreshTime);
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request,
+                                              HttpServletResponse response,
+                                              AuthenticationException failed) throws IOException, ServletException {
+        log.error("Login Failed: {}", failed.getMessage());
 
-        response.addHeader("accessToken", accessToken);
-        response.addHeader("refreshToken", refreshToken);
-        response.addHeader("userId", userDetails.getUserId());
+        super.unsuccessfulAuthentication(request, response, failed);
     }
 }

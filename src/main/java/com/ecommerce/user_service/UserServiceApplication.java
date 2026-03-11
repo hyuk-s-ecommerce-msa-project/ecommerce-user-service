@@ -29,7 +29,7 @@ public class UserServiceApplication {
 				32,
 				2,
 				32768,
-				1
+				2
 		);
 	}
 

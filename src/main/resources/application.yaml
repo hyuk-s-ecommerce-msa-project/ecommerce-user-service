@@ -1,20 +1,16 @@
 server:
   port: 0
-  tomcat:
-    threads:
-      max: 200
-      min-spare: 20
-    connection-timeout: 5000ms
 
 spring:
   threads:
     virtual:
-      enabled: false
+      enabled: true
   datasource:
     hikari:
-      idle-timeout: 600000
-      leak-detection-threshold: 2000
-      maximum-pool-size: 80
+      idle-timeout: 30000
+      max-lifetime: 180000
+      connection-timeout: 30000
+      maximum-pool-size: 100
     url: jdbc:mariadb://localhost:3306/gameinfo_user
   application:
     name: user-service
@@ -87,3 +83,9 @@ management:
           - busrefresh
           - prometheus
           - metrics
+
+logging:
+  level:
+    root: INFO
+    org.springframework.data.redis: ERROR
+    io.lettuce.core: ERROR
