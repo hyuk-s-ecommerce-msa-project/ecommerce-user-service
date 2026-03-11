@@ -15,7 +15,9 @@ spring:
   application:
     name: user-service
   kafka:
-    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: userConsumerGroup
+    bootstrap-servers: kafka:9093
   rabbitmq:
     host: 127.0.0.1
     port: 5672
@@ -24,7 +26,7 @@ spring:
       name: gameinfo,user-service
   config:
     import:
-      - "optional:configserver:http://localhost:9088"
+      - "optional:configserver:http://config-server:9088"
   data:
     redis:
       lettuce:
@@ -73,6 +75,7 @@ management:
       type: kafka
     kafka:
       topic: zipkin
+      bootstrap-servers: kafka:9093
   endpoints:
     web:
       exposure:

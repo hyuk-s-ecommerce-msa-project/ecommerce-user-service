@@ -10,7 +10,7 @@ public class ZipkinConfig {
     @Bean
     public KafkaSender kafkaSender() {
         return KafkaSender.newBuilder()
-                .bootstrapServers("localhost:9092")
+                .bootstrapServers("kafka:9093")
                 .topic("zipkin")
                 .build();
     }
