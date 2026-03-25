@@ -6,8 +6,12 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "catalog-service", configuration = FeignErrorDecoder.class)
+@FeignClient(
+        name = "catalog-service",
+        url = "http://catalog-service:8082", // K8s 서비스 이름:포트
+        configuration = FeignErrorDecoder.class
+)
 public interface CatalogServiceClient {
-    @GetMapping("catalog-service/catalogs/{productId}")
+    @GetMapping("/catalog-service/catalogs/{productId}")
     ResponseWish getCatalogs(@PathVariable("productId") String productId);
 }

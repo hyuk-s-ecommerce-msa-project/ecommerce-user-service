@@ -8,7 +8,11 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.List;
 
-@FeignClient(name = "order-service", configuration = FeignErrorDecoder.class)
+@FeignClient(
+        name = "order-service",
+        url = "http://order-service:8083",
+        configuration = FeignErrorDecoder.class
+)
 public interface OrderServiceClient {
     @GetMapping("/order-service/orders")
     List<ResponseOrder> getOrders(@RequestHeader("userId") String userId);
