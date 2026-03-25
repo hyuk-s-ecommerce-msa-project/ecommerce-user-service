@@ -16,6 +16,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 import org.springframework.security.web.util.matcher.IpAddressMatcher;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -36,6 +39,12 @@ public class WebSecurity {
 
         AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
 
+        String allowedIps = env.getProperty("gateway.ip", "127.0.0.1");
+
+        String accessExpression = Arrays.stream(allowedIps.split(","))
+                .map(ip -> "hasIpAddress('" + ip.trim() + "')")
+                .collect(Collectors.joining(" or "));
+
         http.csrf( (csrf) -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**").permitAll()
@@ -44,9 +53,7 @@ public class WebSecurity {
                         .requestMatchers("/users/**").permitAll()
                         .requestMatchers("/login").permitAll()
                         .requestMatchers("/**").access(
-                                new WebExpressionAuthorizationManager(
-                                        "hasIpAddress('127.0.0.1') or hasIpAddress('::1') or " +
-                                                "hasIpAddress('220.79.105.117')")) // host pc ip address
+                                new WebExpressionAuthorizationManager(accessExpression)) // host pc ip address
                         .anyRequest().authenticated()
                 )
                 .authenticationManager(authenticationManager)
