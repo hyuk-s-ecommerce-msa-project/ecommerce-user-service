@@ -133,6 +133,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto createUser(UserDto userDto) {
+        if (userRepository.findByEmail(userDto.getEmail()) != null) {
+            throw new IllegalArgumentException("Email already exists");
+        }
+
         String uuid = "USER-" + UUID.randomUUID().toString();
         Long snowflakeId = snowflakeIdGenerator.nextId();
 
