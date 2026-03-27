@@ -1,6 +1,7 @@
 package com.ecommerce.user_service.security;
 
 import com.ecommerce.user_service.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,7 +11,6 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
@@ -26,6 +26,7 @@ public class WebSecurity {
     private final UserService userService;
     private final Environment env;
     private final PasswordEncoder argon2PasswordEncoder;
+    private final ObjectMapper objectMapper;
 
     public static final String ALLOWED_IP_ADDRESS = "127.0.0.1";
     public static final String SUBNET = "/32";
@@ -66,7 +67,7 @@ public class WebSecurity {
     }
 
     private AuthenticationFilter getAuthenticationFilter(AuthenticationManager authenticationManager) throws Exception {
-        AuthenticationFilter authenticationFilter = new AuthenticationFilter(userService, env, authenticationManager);
+        AuthenticationFilter authenticationFilter = new AuthenticationFilter(userService, env, objectMapper, authenticationManager);
         authenticationFilter.setAuthenticationManager(authenticationManager);
 
         return authenticationFilter;
