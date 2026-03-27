@@ -17,7 +17,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.crypto.SecretKey;
@@ -31,11 +30,12 @@ import java.util.Date;
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final UserService userService;
     private final Environment env;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
-    public AuthenticationFilter(UserService userService, Environment env, AuthenticationManager authenticationManager) {
+    public AuthenticationFilter(UserService userService, Environment env, ObjectMapper objectMapper, AuthenticationManager authenticationManager) {
         this.userService = userService;
         this.env = env;
+        this.objectMapper = objectMapper;
         super.setAuthenticationManager(authenticationManager);
     }
 
