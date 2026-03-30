@@ -19,4 +19,6 @@ public interface UserService extends UserDetailsService {
 
     void storeRefreshToken(String userId, String refreshToken, long expirationTime);
     TokenResponse reissueAccessToken(String refreshToken);
+
+    void logout(String userId);
 }

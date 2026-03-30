@@ -7,6 +7,7 @@ import com.ecommerce.user_service.vo.RequestPoint;
 import com.ecommerce.user_service.vo.RequestUser;
 import com.ecommerce.user_service.vo.ResponseUser;
 import io.micrometer.core.annotation.Timed;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -86,5 +87,18 @@ public class UserController {
         ResponseUser response = modelMapper.map(userDto, ResponseUser.class);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        String userId = request.getHeader("userId");
+
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User info not found in header");
+        }
+
+        userService.logout(userId);
+
+        return ResponseEntity.status(HttpStatus.OK).body("Logout successfully");
     }
 }
