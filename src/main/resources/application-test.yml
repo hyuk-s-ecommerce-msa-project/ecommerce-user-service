@@ -1,0 +1,10 @@
+spring:
+  cloud:
+    config:
+      enabled: false  # 테스트 중에는 Config Server에 연결하지 않음
+
+services:
+  order-service:
+    url: http://localhost:${wiremock.server.port}
+  catalog-service:
+    url: http://localhost:${wiremock.server.port}
