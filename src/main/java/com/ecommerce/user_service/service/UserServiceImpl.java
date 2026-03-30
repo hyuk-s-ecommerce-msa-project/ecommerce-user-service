@@ -201,4 +201,18 @@ public class UserServiceImpl implements UserService {
 
         return modelMapper.map(userEntity, UserDto.class);
     }
+
+    @Override
+    @Transactional
+    public void logout(String userId) {
+        String redisKey = "refreshToken:" + userId;
+
+        Boolean isDeleted = redisTemplate.delete(redisKey);
+
+        if (isDeleted) {
+            log.info("[Logout] 유저({})의 Refresh Token이 성공적으로 삭제되었습니다.", userId);
+        } else {
+            log.warn("[Logout] 유저({})의 토큰이 이미 없거나 삭제에 실패했습니다.", userId);
+        }
+    }
 }
