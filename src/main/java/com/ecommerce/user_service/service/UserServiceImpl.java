@@ -79,6 +79,8 @@ public class UserServiceImpl implements UserService {
                     .parseSignedClaims(refreshToken)
                     .getPayload()
                     .getSubject();
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            throw new RuntimeException("Refresh token has expired");
         } catch (Exception e) {
             throw new RuntimeException("Invalid refresh token");
         }
@@ -86,7 +88,7 @@ public class UserServiceImpl implements UserService {
         String savedToken = (String) redisTemplate.opsForValue().get("refreshToken:" + userId);
 
         if (savedToken == null || !savedToken.equals(refreshToken)) {
-            throw new RuntimeException("Refresh token expired or invalid");
+            throw new RuntimeException("Refresh token is invalid or already used");
         }
 
         Instant now = Instant.now();
